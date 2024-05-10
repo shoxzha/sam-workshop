@@ -1,126 +1,56 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  sam-workshop01
-  Sample SAM Template for sam-workshop01
-Parameters:
-  SecretArn:
-    Type: String
-    Default: arn:aws-cn:secretsmanager:cn-north-1::
-    Description: SecretManager Arn for the application
-  SchemaName:
-    Type: String
-    Default: sam
-    Description: Schema Name in DB
-  TrustSubnetId01:
-    Type: String
-    Default: 
-    Description: Subnet 01 in AZ1
-  TrustSubnetId02:
-    Type: String
-    Default: 
-    Description: Subnet 02 in AZ2
-  SecurityGroupId:
-    Type: String
-    Default: 
-    Description: Security Group for the Lambda Function
+  shoxtst
+
+  Sample SAM Template for shoxtst
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-# Use !Ref to reference Parameters
 Globals:
   Function:
     Timeout: 3
-    MemorySize: 128
+
+    # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
+    LoggingConfig:
+      LogFormat: JSON
 Resources:
-  PythonFunction:
+  HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: pythonapi/
+      CodeUri: hello_world/
       Handler: app.lambda_handler
       Runtime: python3.10
       Architectures:
       - x86_64
-      Policies:
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretArn
-        - VPCAccessPolicy: {}
-      Environment:
-        Variables:
-          SecretArn: !Ref SecretArn
-          SchemaName: !Ref SchemaName
-      VpcConfig:
-        SecurityGroupIds:
-          - !Ref SecurityGroupId
-        SubnetIds:
-          - !Ref TrustSubnetId01
-          - !Ref TrustSubnetId02
       Events:
-        HelloWorldApi:
+        HelloWorld:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
+            RestApiId: !Ref MyApi
             Path: /hello
             Method: get
-        ArtistsApi:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /artists
-            Method: get
-        ArtistsByNameApi:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /artists/{name}
-            Method: get
-  GolangFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  MyApi:
+    Type: AWS::Serverless::Api
     Properties:
-      CodeUri: golangapi/
-      Handler: bootstrap 
-      Runtime: provided.al2
-      Events:
-        GetAlbumsApi:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /albums
-            Method: GET
-        GetAlbumsByIdApi:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /albums/{id}
-            Method: GET
-    Metadata:
-      BuildMethod: makefile
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
-    Properties:
-      Name:
-        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
-    Properties:
-      ResourceGroupName:
-        Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+        UsagePlan:  
+          CreateUsagePlan: PER_API 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   HelloWorldApi:
     Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
-  ArtistsApi:
-    Description: API Gateway endpoint URL for Prod stage for Get Artists function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/artists"
-  PythonFunction:
-    Description: Python Lambda Function ARN
-    Value: !GetAtt PythonFunction.Arn
-  PythonFunctionIamRole:
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt PythonFunctionRole.Arn
-  GolangFunction:
-    Description: Golang Lambda Function ARN
-    Value: !GetAtt GplangFunction.Arn
-  GplangFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt GplangFunctionRole.Arn
+    Value: !GetAtt HelloWorldFunctionRole.Arn
+  # HelloWorldApiKey:
+  #   Description: UsagePlan apikey for api Gateway
+  #   Value: !Sub "aws apigateway get-api-key --api-key ${MyApi.} --include-value --query \"value\" --output text"
