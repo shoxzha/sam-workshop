@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  shoxtst
 
   Sample SAM Template for shoxtst
 
@@ -35,9 +34,9 @@ Resources:
     Properties:
       StageName: Prod
       Auth:
-        ApiKeyRequired: true # sets for all methods
-        UsagePlan:  
-          CreateUsagePlan: PER_API 
+        ApiKeyRequired: false # sets for all methods
+        # UsagePlan:  
+        #   CreateUsagePlan: PER_API 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
@@ -51,6 +50,6 @@ Outputs:
   HelloWorldFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
     Value: !GetAtt HelloWorldFunctionRole.Arn
-  HelloWorldApiKey:
-    Description: Command to get UsagePlan apikey for api Gateway
-    Value: !Sub "aws apigateway get-api-key --api-key ${MyApiApiKey.APIKeyId} --include-value --query \"value\" --output text"
+  # HelloWorldApiKey:
+  #   Description: Command to get UsagePlan apikey for api Gateway
+  #   Value: !Sub "aws apigateway get-api-key --api-key ${MyApiApiKey.APIKeyId} --include-value --query \"value\" --output text"
