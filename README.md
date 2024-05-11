@@ -17,4 +17,6 @@ To build and deploy your application for the first time, run the following in yo
 ```bash
 sam build
 sam deploy --guided
+sam sync --stack-name <your stackname>
 ```
+
