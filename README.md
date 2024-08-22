@@ -15,8 +15,15 @@ To use the SAM CLI, you need the following tools.
 To build and deploy your application for the first time, run the following in your shell:
 
 ```bash
-sam build
+sam build --template-file template.yaml
 sam deploy --guided
 sam sync --stack-name <your stackname>
 ```
 
+```bash
+sam build --template-file ddbtemplate.yaml
+sam deploy --guided
+sam sync --stack-name <your stackname>
+```
+
+lambda function index.py→lambda_function.py

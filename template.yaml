@@ -28,7 +28,7 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /hello
             Method: get
-
+            
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -37,6 +37,8 @@ Resources:
         ApiKeyRequired: false # sets for all methods
         # UsagePlan:  
         #   CreateUsagePlan: PER_API 
+
+  
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
